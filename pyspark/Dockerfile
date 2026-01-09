@@ -12,7 +12,7 @@ RUN curl -s -L "https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-
     curl -s -L "https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/${AWS_SDK_VERSION}/bundle-${AWS_SDK_VERSION}.jar" \
     -o /opt/spark/jars/aws-sdk-bundle.jar && \
     pip install pyspark && \
-    echo "Installed pypsark"
+    echo "Installed pyspark"
 
 # Standard tail bash command to keep container alive
 ENTRYPOINT ["tail", "-f", "/dev/null"]
