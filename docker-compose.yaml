@@ -1,0 +1,31 @@
+services:
+  polaris:
+    image: apache/polaris:1.2.0-incubating
+    ports:
+      - "8181:8181"
+    environment:
+      - POLARIS_AUTHENTICATOR_TYPE=password-auth # Simplified for local dev
+      - POLARIS_BOOTSTRAP_PASSWORD=admin-password
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+
+  spark-iceberg:
+    build: /home/lucas/Projects/iceberging/pyspark
+    depends_on:
+      - polaris
+      - minio
+    environment:
+      # Direct Spark to use the Polaris REST Catalog
+      - SPARK_CONF_spark_sql_catalog_polaris=org.apache.iceberg.spark.SparkCatalog
+      - SPARK_CONF_spark_sql_catalog_polaris_catalog-impl=org.apache.iceberg.rest.RESTCatalog
+      - SPARK_CONF_spark_sql_catalog_polaris_uri=http://polaris:8181/api/catalog
+      - SPARK_CONF_spark_sql_catalog_polaris_warehouse=s3a://iceberg-warehouse/
+      - SPARK_CONF_spark_sql_catalog_polaris_header_X-Iceberg-Access-Token=your-token-here
